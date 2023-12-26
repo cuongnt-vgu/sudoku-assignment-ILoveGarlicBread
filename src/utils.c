@@ -1,3 +1,4 @@
+// utils.c
 #include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -13,11 +14,11 @@ void init_sudoku(SudokuBoard *p_board) {
     p_board->p_boxes[i] = malloc(BOARD_SIZE * sizeof(Cell *));
   }
 
-  // assign rows, cols, boxes constraint
   for (int i = 0; i < BOARD_SIZE; i++) {
+    // assign rows, cols, boxes constraint
     for (int j = 0; j < BOARD_SIZE; j++) {
-      p_board->p_cols[j][i] = &p_board->data[i][j];
       p_board->p_rows[i][j] = &p_board->data[i][j];
+      p_board->p_cols[j][i] = &p_board->data[i][j];
       p_board->p_boxes[(i / 3) * 3 + j / 3][(i % 3) * 3 + j % 3] =
           &p_board->data[i][j];
 
@@ -27,13 +28,12 @@ void init_sudoku(SudokuBoard *p_board) {
       p_board->data[i][j].box_index = (i / 3) * 3 + j / 3;
     }
   }
-
   p_board->solved_counter = 0;
 }
 
 void free_sudoku(SudokuBoard *p_board) {
+  free(p_board->data[i]);
   for (int i = 0; i < BOARD_SIZE; i++) {
-    free(p_board->data[i]);
     free(p_board->p_rows[i]);
     free(p_board->p_cols[i]);
     free(p_board->p_boxes[i]);
@@ -47,23 +47,26 @@ bool is_solved(SudokuBoard *p_board) {
 
 void print_solution(SudokuBoard *p_board) {
   assert(is_solved(p_board));
-  int i, j;
+
   printf("-------------------------\n");
-  for (i = 0; i < BOARD_SIZE; i++) {
+  for (int i = 0; i < BOARD_SIZE; i++) {
+    if (i % 3 == 0 && i > 0) {
+      printf("-------------------------\n");
+    }
     printf("| ");
-    for (j = 0; j < BOARD_SIZE; j++) {
+    for (int j = 0; j < BOARD_SIZE; j++) {
+      if (j % 3 == 0 && j > 0) {
+        printf("| ");
+      }
       int *candidates = get_candidates(&p_board->data[i][j]);
       printf("%d ", candidates[0]);
       free(candidates);
-      if ((j + 1) % 3 == 0) {
-        printf("| ");
-      }
     }
+    printf("| ");
     printf("\n");
-    if ((i + 1) % 3 == 0) {
-      printf("-------------------------\n");
-    }
   }
+
+  printf("-------------------------\n");
 }
 
 void set_candidate(Cell *cell, int value) {
@@ -126,6 +129,7 @@ void load_sudoku(SudokuBoard *p_board, char *textData) {
 }
 
 bool apply_constraint(Cell **p_cells, int value) {
+  ;
   bool ret = false;
 
   for (int i = 0; i < BOARD_SIZE; i++) {

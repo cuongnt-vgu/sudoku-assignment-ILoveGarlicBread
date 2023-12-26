@@ -1,3 +1,4 @@
+// sudoku.c
 #include "utils.h"
 
 #include <assert.h>
@@ -19,16 +20,22 @@ int main(int argc, char **argv) {
   Cell **p_solved_cells = board->solved_cells;
   int solved_counter = board->solved_counter;
   while (board->solved_counter < BOARD_SIZE * BOARD_SIZE) {
+    int previous_solved_counter = board->solved_counter;
     solved_counter = check_solved_cells(board, &p_solved_cells);
     printf("check_solved_cells %d\n", solved_counter);
     if (show_possible(board, p_solved_cells, solved_counter)) {
       printf("show_possible -> Yes\n");
-      continue;
+    } else {
+
+      solved_counter = hidden_singles(board);
+      if (solved_counter) {
+        printf("hidden_singles %d\n", solved_counter);
+        print_hidden_singles(board);
+      }
     }
-    solved_counter = hidden_singles(board);
-    if (solved_counter) {
-      printf("hidden_singles %d\n", solved_counter);
-      continue;
+    if (board->solved_counter == previous_solved_counter) {
+      printf("No progress made. Exiting the loop.\n");
+      break;
     }
   }
   print_solution(board);
